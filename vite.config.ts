@@ -8,4 +8,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
   },
+  build: {
+    outDir: 'docs', // ✅ use docs instead of dist
+  },
 })
