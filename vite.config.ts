@@ -11,4 +11,5 @@ export default defineConfig({
   build: {
     outDir: 'docs', // ✅ use docs instead of dist
   },
+  base: './', // belangrijk voor relatieve paden
 })
