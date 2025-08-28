@@ -3,7 +3,7 @@ import { RandomItem } from './components/RandomItem'
 function App() {
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-6">
-      <h1 className="text-3xl font-bold">Oma zei vroeger altijd:</h1>
+      <h1 className="text-3xl font-bold">Mijn oma zei vroeger altijd:</h1>
       <div className="flex items-center justify-center bg-gray-100">
       <RandomItem />
     </div>
