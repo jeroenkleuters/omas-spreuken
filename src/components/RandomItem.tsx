@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import data from '../data/spreuken.json'
 
 type Item = {
@@ -16,23 +15,42 @@ const allItems: Item[] = (data as Hoofdgroep[]).flatMap(group => group.items)
 
 export const RandomItem = () => {
   const [item, setItem] = useState<Item | null>(null)
+  const [shownItems, setShownItems] = useState<Item[]>([])
 
-  const pickRandom = () => {
-    const randomIndex = Math.floor(Math.random() * allItems.length)
-    setItem(allItems[randomIndex])
-  }
-
-   // Kies direct bij laden een item
+  // 🔹 laad eerder getoonde items uit sessionStorage
   useEffect(() => {
-    pickRandom()
+    const stored = sessionStorage.getItem('shownItems')
+    if (stored) {
+      setShownItems(JSON.parse(stored))
+    }
   }, [])
 
+  // 🔹 helper: random item kiezen dat nog niet getoond is
+  const pickRandom = () => {
+    const remaining = allItems.filter(
+      i => !shownItems.some(shown => shown.vraag === i.vraag)
+    )
+
+    // Als alles al getoond is → reset
+    const pool = remaining.length > 0 ? remaining : allItems
+
+    const randomIndex = Math.floor(Math.random() * pool.length)
+    const chosen = pool[randomIndex]
+
+    setItem(chosen)
+
+    const updatedShown =
+      remaining.length > 0 ? [...shownItems, chosen] : [chosen]
+
+    setShownItems(updatedShown)
+    sessionStorage.setItem('shownItems', JSON.stringify(updatedShown))
+  }
+
   return (
-    <div className="p-6 rounded-xl   flex flex-col gap-4 max-w-xl">
-  
+    <div className="p-4 rounded-xl flex flex-col gap-4 max-w-xl">  
 
       {item && (
-        <div>
+        <div className="text-center">
           <p className="font-bold text-lg text-gray-800">{item.vraag}</p>
           {item.antwoord && (
             <p className="text-gray-800 mt-2">Antwoord: {item.antwoord}</p>
