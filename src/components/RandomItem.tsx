@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import data from '../data/spreuken.json'
+import data from '../data/data.json'
 
 type Item = {
   vraag: string
@@ -11,41 +11,60 @@ type Hoofdgroep = {
   items: Item[]
 }
 
-const allItems: Item[] = (data as Hoofdgroep[]).flatMap(group => group.items)
+const allItems: Item[] = (data as Hoofdgroep[]).flatMap(g => g.items)
+
+// Helper die, gegeven de huidige (prev) lijst, de volgende keuze bepaalt
+function pickNext(prevShown: Item[]) {
+  const remaining = allItems.filter(
+    i => !prevShown.some(shown => shown.vraag === i.vraag)
+  )
+  const pool = remaining.length > 0 ? remaining : allItems
+  const chosen = pool[Math.floor(Math.random() * pool.length)]
+  const updatedShown = remaining.length > 0 ? [...prevShown, chosen] : [chosen]
+  return { chosen, updatedShown }
+}
 
 export const RandomItem = () => {
-  const [item, setItem] = useState<Item | null>(null)
-  const [shownItems, setShownItems] = useState<Item[]>([])
-
-  // 🔹 laad eerder getoonde items uit sessionStorage
-  useEffect(() => {
-    const stored = sessionStorage.getItem('shownItems')
-    if (stored) {
-      setShownItems(JSON.parse(stored))
+  // Lazy init: haal direct uit sessionStorage bij eerste render
+  const [shownItems, setShownItems] = useState<Item[]>(() => {
+    try {
+      const stored = sessionStorage.getItem('shownItems')
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
     }
+  })
+  const [item, setItem] = useState<Item | null>(null)
+
+  // Bij eerste mount automatisch een item kiezen (zoals eerder gewenst)
+  useEffect(() => {
+    if (!item) {
+      setShownItems(prev => {
+        const { chosen, updatedShown } = pickNext(prev)
+        setItem(chosen)
+        sessionStorage.setItem('shownItems', JSON.stringify(updatedShown))
+        return updatedShown
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // 🔹 helper: random item kiezen dat nog niet getoond is
   const pickRandom = () => {
-    const remaining = allItems.filter(
-      i => !shownItems.some(shown => shown.vraag === i.vraag)
-    )
-
-    // Als alles al getoond is → reset
-    const pool = remaining.length > 0 ? remaining : allItems
-
-    const randomIndex = Math.floor(Math.random() * pool.length)
-    const chosen = pool[randomIndex]
-
-    setItem(chosen)
-
-    const updatedShown =
-      remaining.length > 0 ? [...shownItems, chosen] : [chosen]
-
-    setShownItems(updatedShown)
-    sessionStorage.setItem('shownItems', JSON.stringify(updatedShown))
+    setShownItems(prev => {
+      const { chosen, updatedShown } = pickNext(prev)
+      setItem(chosen)
+      sessionStorage.setItem('shownItems', JSON.stringify(updatedShown))
+      return updatedShown
+    })
   }
 
+  const resetSession = () => {
+    // Wis storage én state. Niet direct opnieuw kiezen, zodat alles echt leeg is op het scherm.
+    sessionStorage.removeItem('shownItems')
+    setShownItems([])
+    setItem(null)
+  }
+  
   return (
     <div className="p-4 rounded-xl flex flex-col gap-4 max-w-xl">  
 
@@ -57,12 +76,31 @@ export const RandomItem = () => {
           )}
         </div>
       )}
-      <button
+        <button
         onClick={pickRandom}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
+        >
         Toon een andere spreuk
-      </button>
+        </button>
+        
+      {/* Geschiedenis */}
+      {shownItems.length > 1 && (
+        <><div className="mt-4">
+                  <h2 className="font-semibold text-md text-gray-800 mb-2">Reeds getoond:</h2>
+                  <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 max-h-48 overflow-y-auto">
+                      {shownItems
+                          .slice(0, -1) // laatste item = huidige vraag
+                          .map((shown, idx) => (
+                              <li key={idx}>{shown.vraag}</li>
+                          ))}
+                  </ul>
+              </div><button
+                  onClick={resetSession}
+                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >Reset sessie</button>
+        </>
+      )}
+      
     </div>
   )
 }
