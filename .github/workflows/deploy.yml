@@ -23,6 +23,8 @@ jobs:
 
       - name: Build project
         run: npm run build
+      # - name: Build project
+      #   run: npm exec vite build
 
       - name: Commit and push docs folder
         run: |
