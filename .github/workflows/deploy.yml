@@ -34,7 +34,7 @@ jobs:
 
       - name: Push changes
         env:
-          GH_PAT: ${{ secrets.DEPLOY_PAT }}
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}
           git add .
