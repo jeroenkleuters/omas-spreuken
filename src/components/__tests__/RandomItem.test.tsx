@@ -1,9 +1,10 @@
+// __tests__/RandomItem.test.tsx
+
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { RandomItem } from '../RandomItem'
 
 // 🔹 Mock data.json zodat we voorspelbare data hebben
-vi.mock('../data.json', () => {
+vi.mock('../../data/data.json', () => {
   return {
     default: [
       {
@@ -18,47 +19,116 @@ vi.mock('../data.json', () => {
   }
 })
 
+import { RandomItem } from '../RandomItem'
+
 // 🧹 Elke test begint met een schone sessionStorage
 beforeEach(() => {
   sessionStorage.clear()
 })
 
 describe('RandomItem component', () => {
-  it('toont initieel een item', () => {
+  it('toont automatisch een eerste vraag', async () => {
     render(<RandomItem />)
-    expect(
-      screen.getByText(/Nog geen item geselecteerd/i)
-    ).not.toBeInTheDocument()
+
+    const active = await screen.findByTestId('active-vraag')
+    expect(active).toBeInTheDocument()
+    expect(active.textContent).toMatch(/Vraag \d/)
   })
 
-  it('toont een nieuw item na klikken op "Nieuwe random vraag"', () => {
+  it('voegt een item toe aan de geschiedenis na klikken op "Toon een andere spreuk"', async () => {
     render(<RandomItem />)
-    const firstItem = screen.getByText(/./).textContent
 
-    const button = screen.getByRole('button', { name: /Nieuwe random vraag/i })
+    // Eerste vraag komt vanzelf
+    await screen.findByTestId('active-vraag')
+
+    const button = await screen.findByRole('button', {
+      name: /Toon een andere spreuk/i
+    })
     fireEvent.click(button)
 
-    const newItem = screen.getByText(/./).textContent
-    expect(newItem).not.toEqual(firstItem)
+    // In de geschiedenis hoort nu precies 1 item te staan
+    const historyItems = await screen.findAllByRole('listitem')
+    expect(historyItems).toHaveLength(1)
   })
 
-  it('wist geschiedenis en item bij reset', () => {
+  it('laat de resetknop pas zien na meerdere vragen', async () => {
     render(<RandomItem />)
 
-    // Eerst een item ophalen
-    const vraagBefore = screen.getByText(/./).textContent
-    expect(vraagBefore).toBeTruthy()
+    await screen.findByTestId('active-vraag')
 
-    // Klik op reset
-    const resetButton = screen.getByRole('button', { name: /Reset sessie/i })
+    // Resetknop mag nog niet bestaan
+    expect(screen.queryByRole('button', { name: /Reset sessie/i })).toBeNull()
+
+    // Klik → nu 2 vragen getoond
+    const button = await screen.findByRole('button', {
+      name: /Toon een andere spreuk/i
+    })
+    fireEvent.click(button)
+
+    // Nu moet resetknop wel bestaan
+    expect(
+      await screen.findByRole('button', { name: /Reset sessie/i })
+    ).toBeInTheDocument()
+  })
+
+  it('wist geschiedenis en actieve vraag bij reset', async () => {
+    render(<RandomItem />)
+
+    await screen.findByTestId('active-vraag')
+
+    // Klik om tweede vraag te krijgen
+    const button = await screen.findByRole('button', {
+      name: /Toon een andere spreuk/i
+    })
+    fireEvent.click(button)
+
+    // Resetknop verschijnt
+    const resetButton = await screen.findByRole('button', {
+      name: /Reset sessie/i
+    })
     fireEvent.click(resetButton)
 
-    // Na reset zou de "Nog geen item geselecteerd" melding zichtbaar zijn
-    expect(
-      screen.getByText(/Nog geen item geselecteerd/i)
-    ).toBeInTheDocument()
+    // Na reset: geen geschiedenis
+    expect(screen.queryByRole('listitem')).toBeNull()
 
-    // En er mag geen "Reeds getoond" lijst staan
-    expect(screen.queryByText(/Reeds getoond/i)).not.toBeInTheDocument()
+    // En geen actieve vraag meer
+    expect(screen.queryByTestId('active-vraag')).toBeNull()
+  })
+
+    it('slaat getoonde items op in sessionStorage', async () => {
+    render(<RandomItem />)
+
+    // Eerste vraag wordt automatisch gekozen
+    await screen.findByTestId('active-vraag')
+
+    // Controleer sessionStorage na eerste render
+    let stored = sessionStorage.getItem('shownItems')
+    expect(stored).not.toBeNull()
+    let items = JSON.parse(stored!)
+    expect(items.length).toBe(1)
+
+    // Klik om een nieuwe vraag te tonen
+    const button = await screen.findByRole('button', {
+      name: /Toon een andere spreuk/i
+    })
+    fireEvent.click(button)
+
+    // Controleer sessionStorage opnieuw
+    stored = sessionStorage.getItem('shownItems')
+    items = JSON.parse(stored!)
+    expect(items.length).toBe(2) // nu twee getoonde items
+  })
+
+  it('reset wist sessionStorage', async () => {
+    render(<RandomItem />)
+
+    // Klik om meerdere items te tonen
+    const button = await screen.findByRole('button', { name: /Toon een andere spreuk/i })
+    fireEvent.click(button)
+
+    const resetButton = await screen.findByRole('button', { name: /Reset sessie/i })
+    fireEvent.click(resetButton)
+
+    expect(sessionStorage.getItem('shownItems')).toBeNull()
   })
 })

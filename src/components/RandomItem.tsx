@@ -70,7 +70,9 @@ export const RandomItem = () => {
 
       {item && (
         <div className="text-center">
-          <p className="font-bold text-lg text-gray-800">{item.vraag}</p>
+          <p data-testid="active-vraag" className="font-bold text-lg text-gray-800">
+            {item.vraag}
+          </p>
           {item.antwoord && (
             <p className="text-gray-800 mt-2">Antwoord: {item.antwoord}</p>
           )}
@@ -78,6 +80,7 @@ export const RandomItem = () => {
       )}
         <button
         onClick={pickRandom}
+        name='show'
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
         Toon een andere spreuk
@@ -91,11 +94,12 @@ export const RandomItem = () => {
                       {shownItems
                           .slice(0, -1) // laatste item = huidige vraag
                           .map((shown, idx) => (
-                              <li key={idx}>{shown.vraag}</li>
+                              <li data-testid='quote' key={idx}>{shown.vraag}</li>
                           ))}
                   </ul>
               </div><button
                   onClick={resetSession}
+                  name='reset'
                   className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
               >Reset sessie</button>
         </>
