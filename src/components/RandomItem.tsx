@@ -94,8 +94,7 @@ export const RandomItem = () => {
                       {shownItems
                           .slice(0, -1) // laatste item = huidige vraag
                           .map((shown, idx) => (
-                              <li data-testid='quote' key={idx}>
-                                <p className="font-bold">{shown.vraag}</p></li>
+                              <li data-testid='quote' key={idx}>{shown.vraag}</li>
                           ))}
                   </ul>
               </div><button
