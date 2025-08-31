@@ -9,3 +9,6 @@ body {
   background-size: cover;
   background-attachment: fixed;
 }
+
+button {
+  user-select: none;}
