@@ -70,7 +70,7 @@ export const RandomItem = () => {
 
       {item && (
         <div className="text-center">
-          <p data-testid="active-vraag" className="font-bold text-lg text-gray-800">
+          <p data-testid="active-vraag" className="font-bold text-2xl text-pink-500 animate-bounce">
             {item.vraag}
           </p>
           {item.antwoord && (
@@ -93,6 +93,7 @@ export const RandomItem = () => {
                   <ul className="space-y-1 text-sm text-gray-700 max-h-48 overflow-y-auto">
                       {shownItems
                           .slice(0, -1) // laatste item = huidige vraag
+                          .sort((a, b) => b.vraag.localeCompare(a.vraag)) // alfabetisch
                           .map((shown, idx) => (
                               <li data-testid='quote' key={idx}>{shown.vraag}</li>
                           ))}

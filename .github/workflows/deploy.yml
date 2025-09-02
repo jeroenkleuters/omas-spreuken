@@ -27,6 +27,9 @@ jobs:
       - name: Build project
         run: npx vite build
 
+      - name: Run tests
+        run: npm run test
+
       - name: Commit and push docs folder
         run: |
           git config --global user.name "github-actions[bot]"

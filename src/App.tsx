@@ -11,7 +11,7 @@ Op deze webapp kun je ze vinden 😊</div>
         <div className="flex flex-col items-center justify-center h-screen gap-6">
           <div className="flex flex-col items-center justify-center h-screen gap-6">
           <div className="bg-white w-auto min-w-sm lg:min-w-lg max-w-5xl h-auto flex flex-col items-center justify-center p-2 rounded-lg shadow-lg">
-            <h1 className="text-2xl font-bold text-blue-900">Mijn oma zei vroeger altijd:</h1>
+            <h1 className="text-xl font-bold text-blue-900">Mijn oma zei vroeger altijd:</h1>
             {!showAll && (
               <>
                 <div className="flex items-center justify-center flex-col">
