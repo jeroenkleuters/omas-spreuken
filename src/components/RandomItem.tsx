@@ -90,7 +90,7 @@ export const RandomItem = () => {
       {shownItems.length > 1 && (
         <><div className="mt-4">
                   <h2 className="font-semibold text-md text-gray-800 mb-2">Reeds getoond:</h2>
-                  <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 max-h-48 overflow-y-auto">
+                  <ul className="space-y-1 text-sm text-gray-700 max-h-48 overflow-y-auto">
                       {shownItems
                           .slice(0, -1) // laatste item = huidige vraag
                           .map((shown, idx) => (
@@ -100,7 +100,7 @@ export const RandomItem = () => {
               </div><button
                   onClick={resetSession}
                   name='reset'
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  className="bg-none text-blue-900 underline"
               >Reset sessie</button>
         </>
       )}
