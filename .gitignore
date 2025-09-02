@@ -2,3 +2,4 @@
 dist/
 node_modules/.cache/
 node_modules/.vite/vitest/*
+omas-spreuken.code-workspace
