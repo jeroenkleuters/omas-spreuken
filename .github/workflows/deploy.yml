@@ -21,14 +21,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Run tests
+        run: npm run test -- --run
+        # --run voorkomt interactive mode in CI
+
       - name: Fix vite permissions (if needed)
         run: chmod +x ./node_modules/.bin/vite
 
       - name: Build project
         run: npx vite build
-
-      - name: Run tests
-        run: npm run test
 
       - name: Commit and push docs folder
         run: |
