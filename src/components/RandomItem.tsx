@@ -88,7 +88,7 @@ export const RandomItem = () => {
         
       {/* Geschiedenis */}
       {shownItems.length > 1 && (
-        <><div className="mt-4">
+        <><div>
                   <h2 className="font-semibold text-md text-gray-800 mb-2">Reeds getoond:</h2>
                   <ul className="space-y-1 text-sm text-gray-700 max-h-48 overflow-y-auto">
                       {shownItems

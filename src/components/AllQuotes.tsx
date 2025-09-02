@@ -46,13 +46,13 @@ export const AllQuotes = ({ onBack }: Props) => {
         ))}
       </div>
 
-      <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 max-h-48 overflow-y-auto">
+      <ul className="space-y-1 text-sm text-gray-700 max-h-48 overflow-y-auto">
         {groups
           .find(g => g.hoofdgroep === activeGroup)
           ?.items.map((item, idx) => (
             <li key={idx}>
-              <p className="font-bold">{item.vraag}</p>
-              {item.antwoord && <p className="text-gray-700">{item.antwoord}</p>}
+              <p>{item.vraag}</p>
+              {item.antwoord && <p className="text-gray-700 italic pl-4">{item.antwoord}</p>}
             </li>
           ))}
       </ul>
